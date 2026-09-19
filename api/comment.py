@@ -24,7 +24,7 @@ from http.server import BaseHTTPRequestHandler
 
 # AI Studio(aistudio.google.com)에서 지금 쓸 수 있는 모델 이름으로 맞춘다.
 # 모델 이름과 무료 한도는 자주 바뀐다 — 교안의 이름을 그대로 믿지 말 것.
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-3.6-flash"
 ENDPOINT = ("https://generativelanguage.googleapis.com/v1beta/"
             "models/{model}:generateContent")
 TIMEOUT = 6
@@ -99,13 +99,7 @@ class handler(BaseHTTPRequestHandler):
                        [str(x) for x in req.get("directions", [])][:10])
             self._send(got or {"comment": None})
         except Exception as e:
-            import traceback
-            traceback.print_exc()  # DEBUG: Vercel Logs 에서 원인 확인용 (임시)
-            if isinstance(e, urllib.error.HTTPError):
-                try:
-                    print("HTTPError body:", e.read().decode("utf-8"))
-                except Exception:
-                    pass
+            print(f"comment 실패: {e}")  # Vercel Logs 에서 원인 확인용
             # 무엇이 실패하든 앱을 멈추지 않는다
             self._send({"comment": None})
 
