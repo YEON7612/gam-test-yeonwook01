@@ -98,7 +98,14 @@ class handler(BaseHTTPRequestHandler):
                        str(req.get("grade", "")),
                        [str(x) for x in req.get("directions", [])][:10])
             self._send(got or {"comment": None})
-        except Exception:
+        except Exception as e:
+            import traceback
+            traceback.print_exc()  # DEBUG: Vercel Logs 에서 원인 확인용 (임시)
+            if isinstance(e, urllib.error.HTTPError):
+                try:
+                    print("HTTPError body:", e.read().decode("utf-8"))
+                except Exception:
+                    pass
             # 무엇이 실패하든 앱을 멈추지 않는다
             self._send({"comment": None})
 
