@@ -8,7 +8,7 @@
   --line: #2f3358;
   --ink: #f2f3fb;
   --muted: #9aa0c6;
-  --brand: #7c8cff;
+  --brand: #fb923c;
   --ok: #34d399;
   --warn: #fbbf24;
   --miss: #fb7185;
@@ -87,7 +87,7 @@ button {
   transition: transform .06s ease, border-color .15s ease;
 }
 .choice:active { transform: scale(.985); }
-.choice[aria-pressed="true"] { border-color: var(--brand); background: #2a2f5c; }
+.choice[aria-pressed="true"] { border-color: var(--brand); background: rgba(251,146,60,.14); }
 
 /* 슬라이더 */
 .slider-out {
@@ -131,7 +131,7 @@ input[type=range]::-moz-range-thumb {
 
 /* 결과 — 촌평 */
 .ai {
-  background: linear-gradient(135deg, #2a2f5c, #21243f);
+  background: linear-gradient(135deg, rgba(251,146,60,.22), var(--card));
   border: 1px solid var(--line); border-radius: var(--radius);
   padding: 16px 17px; font-size: 14.5px; margin-bottom: 16px;
 }
