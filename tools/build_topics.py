@@ -940,8 +940,8 @@ topic(
 
 # ── 화면에 보여줄 카드 순서 ──────────────────────────────────────
 # 계산 순서(위 코드 순서)와 화면에 보이는 카드 순서는 다를 수 있다.
-# cities(내 주제) → 보너스 2개 → 나머지는 원래 만든 순서.
-_CARD_ORDER = ["cities", "food-consumption", "carbon"]
+# 포켓몬 → 빅맥 → 세계 음식 소비량 → 탄소 배출량 → cities → 나머지는 원래 순서.
+_CARD_ORDER = ["pokemon", "bigmac", "food-consumption", "carbon", "cities"]
 _original_order = list(TOPICS)
 
 

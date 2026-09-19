@@ -53,11 +53,18 @@
   ],
   "topics": [
     {
-      "id": "cities",
-      "emoji": "🏙️",
-      "title": "서울·도쿄·런던·싱가포르",
-      "blurb": "네 도시의 30년 평년값 (1991~2020)",
-      "source": "Open-Meteo Archive (ERA5 재분석)"
+      "id": "pokemon",
+      "emoji": "👾",
+      "title": "포켓몬 스펙 감각",
+      "blurb": "겉모습만 보고 몸무게·스피드 비교하기 (PokeAPI)",
+      "source": "PokeAPI"
+    },
+    {
+      "id": "bigmac",
+      "emoji": "🍔",
+      "title": "세계 체감 물가 퀴즈",
+      "blurb": "빅맥 가격으로 보는 나라별 물가 (2000~현재)",
+      "source": "The Economist Big Mac Index"
     },
     {
       "id": "food-consumption",
@@ -72,6 +79,13 @@
       "title": "1인당 탄소 배출량",
       "blurb": "나라별 1인당 CO2 배출량 (1750~현재)",
       "source": "Our World in Data (Global Carbon Project)"
+    },
+    {
+      "id": "cities",
+      "emoji": "🏙️",
+      "title": "서울·도쿄·런던·싱가포르",
+      "blurb": "네 도시의 30년 평년값 (1991~2020)",
+      "source": "Open-Meteo Archive (ERA5 재분석)"
     },
     {
       "id": "seoul-heat",
@@ -135,20 +149,6 @@
       "title": "얼마나 오래 사나",
       "blurb": "나라별 기대수명 1950~현재",
       "source": "Our World in Data"
-    },
-    {
-      "id": "pokemon",
-      "emoji": "👾",
-      "title": "포켓몬 스펙 감각",
-      "blurb": "겉모습만 보고 몸무게·스피드 비교하기 (PokeAPI)",
-      "source": "PokeAPI"
-    },
-    {
-      "id": "bigmac",
-      "emoji": "🍔",
-      "title": "세계 체감 물가 퀴즈",
-      "blurb": "빅맥 가격으로 보는 나라별 물가 (2000~현재)",
-      "source": "The Economist Big Mac Index"
     }
   ]
 }
