@@ -859,6 +859,85 @@ topic(
            "전투에서 누가 먼저 행동할지를 정하는 수치이고, 몸무게도 게임 "
            "세대가 바뀌며 조정되기도 합니다.")
 
+# ── 14. 세계 체감 물가 퀴즈 (보너스) ─────────────────────────────
+# 빅맥 지수: 같은 상품(빅맥) 가격을 나라별로 비교해 환율의 적정성을 가늠하는
+# 이코노미스트의 지표. raw = 소득 수준을 고려하지 않은 단순 비교,
+# adjusted = 1인당 GDP로 보정한 비교.
+bm = load_csv("bigmac.csv")
+bm_dates = sorted(set(r["date"] for r in bm))
+bm_latest = bm_dates[-1]
+bm_cur = [r for r in bm if r["date"] == bm_latest]
+
+kor_bm = next(r for r in bm_cur if r["iso_a3"] == "KOR")
+usa_bm = next(r for r in bm_cur if r["iso_a3"] == "USA")
+jpn_bm = next(r for r in bm_cur if r["iso_a3"] == "JPN")
+chn_bm = next(r for r in bm_cur if r["iso_a3"] == "CHN")
+
+kor_price_won = float(kor_bm["local_price"])
+kor_price_usd = float(kor_bm["dollar_price"])
+kor_under_pct = abs(float(kor_bm["USD_raw"])) * 100
+
+bm_ranked = sorted(bm_cur, key=lambda r: -float(r["dollar_price"]))
+che_bm = next(r for r in bm_cur if r["iso_a3"] == "CHE")
+
+chn_raw_pct = float(chn_bm["USD_raw"]) * 100
+chn_adj_pct = float(chn_bm["USD_adjusted"]) * 100
+
+kor_bm_hist = sorted([r for r in bm if r["iso_a3"] == "KOR"],
+                      key=lambda r: r["date"])
+kor_won_2000 = float(kor_bm_hist[0]["local_price"])
+kor_won_growth = kor_price_won / kor_won_2000
+
+trio_bm = {"스위스": float(che_bm["dollar_price"]),
+           "미국": float(usa_bm["dollar_price"]),
+           "한국": kor_price_usd, "일본": float(jpn_bm["dollar_price"])}
+top_bm_c = max(trio_bm, key=trio_bm.get)
+
+topic(
+    "bigmac", "🍔", "세계 체감 물가 퀴즈",
+    "빅맥 가격으로 보는 나라별 물가 (2000~현재)",
+    "The Economist Big Mac Index",
+    "https://github.com/TheEconomist/big-mac-data",
+    [
+        slider("b1", f"{bm_latest[:7]} 기준, 한국의 빅맥 가격은 원화로 얼마일까요?",
+               kor_price_won, "원", 3000, 8000, 100,
+               f"{bm_latest[:7]} 한국 {kor_price_won:,.0f}원 "
+               f"(달러로 환산하면 ${kor_price_usd:.2f})",
+               "물가가 올랐다는 건 알아도 정확한 가격을 기억하는 사람은 "
+               "드뭅니다."),
+        slider("b2", "빅맥 지수로 보면, 원화는 달러 대비 몇 % 저평가돼 있을까요?",
+               kor_under_pct, "%", 0, 70, 1,
+               f"미국 빅맥 ${float(usa_bm['dollar_price']):.2f} · 한국 빅맥 "
+               f"${kor_price_usd:.2f} 기준 {kor_under_pct:.1f}% 저평가",
+               "환율이 실제 물가 수준과 얼마나 벌어져 있는지는 체감하기 "
+               "어렵습니다."),
+        choice("b3", "중국 위안화는 '단순 비교(raw)' 기준으로 37% 저평가인데, "
+                     "'소득 수준을 고려한(adjusted)' 기준으로는 저평가 정도가 "
+                     "더 커질까요, 작아질까요?",
+               ["더 커진다", "더 작아진다"], "더 작아진다",
+               f"raw {chn_raw_pct:.1f}% → GDP 조정 후 {chn_adj_pct:.1f}%",
+               "환율만 비교하면 크게 저평가된 것처럼 보이지만, 소득 수준을 "
+               "고려하면 격차가 줄어듭니다. 가난한 나라는 원래 물가 자체가 "
+               "쌉니다."),
+        choice("b4", "스위스·미국·한국·일본 중 빅맥 가격(달러 환산)이 가장 "
+                     "비싼 나라는?",
+               ["스위스", "미국", "한국", "일본"], top_bm_c,
+               " · ".join(f"{k} ${v:.2f}" for k, v in trio_bm.items()),
+               "미국이 제일 비쌀 것 같지만, 물가 높은 유럽 나라들이 그 위에 "
+               "있습니다."),
+        slider("b5", "2000년과 비교해 한국의 빅맥 가격(원화 기준)은 몇 배 "
+                     "올랐을까요?",
+               kor_won_growth, "배", 0, 5, 0.1,
+               f"2000년 {kor_won_2000:,.0f}원 → {bm_latest[:7]} "
+               f"{kor_price_won:,.0f}원 ({kor_won_growth:.1f}배)",
+               "물가가 오른 건 알아도 정확히 두 배가 채 안 된다는 감각은 "
+               "없기 마련입니다."),
+    ],
+    caveat="빅맥 지수는 딱 하나의 상품 가격으로 물가를 추정하는 단순화된 "
+           "지표입니다. 나라마다 임대료·인건비·현지 조달 비용이 다르고, "
+           "인도처럼 소고기 대신 치킨·베지 패티를 쓰는 등 메뉴 구성 자체가 "
+           "달라 '같은 제품'이라 보기 어려운 나라도 있습니다.")
+
 # ── 화면에 보여줄 카드 순서 ──────────────────────────────────────
 # 계산 순서(위 코드 순서)와 화면에 보이는 카드 순서는 다를 수 있다.
 # cities(내 주제) → 보너스 2개 → 나머지는 원래 만든 순서.

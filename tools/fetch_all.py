@@ -125,6 +125,11 @@ SOURCES: list[tuple[str, str, str]] = [
           "pikachu", "jigglypuff", "arcanine", "mamoswine", "snorlax",
           "magnemite", "dragonite", "machamp", "ditto", "gyarados",
       )],
+
+    ("bigmac.csv",
+     "빅맥 지수 2000~현재 (The Economist)",
+     "https://raw.githubusercontent.com/TheEconomist/big-mac-data/master/"
+     "output-data/big-mac-full-index.csv"),
 ]
 
 

@@ -142,6 +142,13 @@
       "title": "포켓몬 스펙 감각",
       "blurb": "겉모습만 보고 몸무게·스피드 비교하기 (PokeAPI)",
       "source": "PokeAPI"
+    },
+    {
+      "id": "bigmac",
+      "emoji": "🍔",
+      "title": "세계 체감 물가 퀴즈",
+      "blurb": "빅맥 가격으로 보는 나라별 물가 (2000~현재)",
+      "source": "The Economist Big Mac Index"
     }
   ]
 }
