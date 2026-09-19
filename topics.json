@@ -128,6 +128,13 @@
       "title": "세계 음식 소비량",
       "blurb": "나라별 1인당 육류·해산물 소비량 (1961~현재)",
       "source": "Our World in Data (FAO)"
+    },
+    {
+      "id": "carbon",
+      "emoji": "🏭",
+      "title": "1인당 탄소 배출량",
+      "blurb": "나라별 1인당 CO2 배출량 (1750~현재)",
+      "source": "Our World in Data (Global Carbon Project)"
     }
   ]
 }

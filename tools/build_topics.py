@@ -713,6 +713,88 @@ topic(
            "버려지는 양까지 포함되어 있어 실제로 몸에 들어가는 양보다 많게 "
            "잡히고, 국가 평균이라 소득·지역별 차이는 드러나지 않습니다.")
 
+# ── 12. 1인당 탄소 배출량 (보너스) ───────────────────────────────
+CO2_COL = "emissions_total_per_capita"
+co2_rows = [r for r in load_csv("co2_per_capita.csv") if r[CO2_COL]]
+
+co2_year = max(int(r["year"]) for r in co2_rows if r["code"] == "KOR")
+co2_cur = owid_countries(co2_rows, co2_year, CO2_COL)
+
+kor_co2 = co2_cur["South Korea"]
+co2_rank = sorted(co2_cur.items(), key=lambda kv: -kv[1])
+kor_co2_rank = [k for k, _ in co2_rank].index("South Korea") + 1
+
+world_co2 = next(float(r[CO2_COL]) for r in co2_rows
+                  if r["code"] == "OWID_WRL" and int(r["year"]) == co2_year)
+
+trio_co2 = {c: co2_cur[c] for c in
+            ("Qatar", "United States", "China", "South Korea")}
+top_co2_c = max(trio_co2, key=trio_co2.get)
+name_co2 = {"Qatar": "카타르", "United States": "미국", "China": "중국",
+            "South Korea": "한국"}
+
+kor_co2_1990 = next(float(r[CO2_COL]) for r in co2_rows
+                    if r["code"] == "KOR" and r["year"] == "1990")
+
+
+def co2_at(code, year):
+    return next(float(r[CO2_COL]) for r in co2_rows
+                if r["code"] == code and r["year"] == str(year))
+
+
+usa_1990, usa_now = co2_at("USA", 1990), co2_cur["United States"]
+deu_1990, deu_now = co2_at("DEU", 1990), co2_cur["Germany"]
+up_since_1990 = max(
+    (("미국", usa_now / usa_1990), ("독일", deu_now / deu_1990),
+     ("한국", kor_co2 / kor_co2_1990)),
+    key=lambda kv: kv[1])[0]
+
+topic(
+    "carbon", "🏭", "1인당 탄소 배출량",
+    "나라별 1인당 CO2 배출량 (1750~현재)",
+    "Our World in Data (Global Carbon Project)",
+    "https://ourworldindata.org/grapher/co-emissions-per-capita",
+    [
+        slider("e1", f"{co2_year}년 한국인 1인당 CO2 배출량은 몇 톤쯤일까요?",
+               kor_co2, "톤", 0, 20, 0.5,
+               f"{co2_year}년 한국 {kor_co2:.1f}톤/인",
+               "탄소 배출은 눈에 보이지 않아서 감으로 맞히기 어렵습니다."),
+        choice("e2", "카타르·미국·중국·한국 중 1인당 CO2 배출량이 가장 많은 "
+                     "나라는?",
+               ["카타르", "미국", "중국", "한국"], name_co2[top_co2_c],
+               " · ".join(f"{name_co2[c]} {trio_co2[c]:.1f}톤" for c in trio_co2),
+               "'배출 하면 미국·중국'이라는 인상이 강하지만, 1인당으로 보면 "
+               "산유국이 압도적으로 높습니다."),
+        choice("e3", "총배출량 세계 1위는 중국인데, 1인당으로는 중국과 한국 중 "
+                     "어느 쪽이 더 많을까요?",
+               ["중국", "한국"], "한국",
+               f"{co2_year}년 중국 {trio_co2['China']:.1f}톤/인 · "
+               f"한국 {kor_co2:.1f}톤/인 (중국은 인구가 훨씬 많아 총량이 "
+               f"앞섭니다)",
+               "'중국이 제일 심하다'는 인상은 총량 기준이고, 1인당으로 보면 "
+               "한국이 더 높습니다."),
+        choice("e4", "1990년과 비교해 1인당 CO2 배출량이 늘어난 나라는 "
+                     "미국·독일·한국 중 어디일까요?",
+               ["미국", "독일", "한국"], up_since_1990,
+               f"1990→{co2_year}년 미국 {usa_1990:.1f}→{usa_now:.1f}톤 · "
+               f"독일 {deu_1990:.1f}→{deu_now:.1f}톤 · "
+               f"한국 {kor_co2_1990:.1f}→{kor_co2:.1f}톤",
+               "'선진국은 계속 줄이고 있다'는 인상과 달리, 한국은 오히려 거의 "
+               "두 배로 늘었습니다."),
+        slider("e5", f"1인당 CO2 배출량 기준, 한국은 전 세계 {len(co2_cur)}개국 "
+                     "중 몇 위일까요?",
+               kor_co2_rank, "위", 1, 60, 1,
+               f"{co2_year}년 {len(co2_cur)}개국 중 {kor_co2_rank}위 "
+               f"(1위 카타르 {co2_rank[0][1]:.1f}톤 · 세계 평균 "
+               f"{world_co2:.1f}톤)",
+               "환경에 신경 쓴다는 인식과 달리, 순위로 보면 상위권에 속합니다."),
+    ],
+    caveat="이 값은 그 나라 안에서 배출된 화석연료·시멘트 CO2만 센 '생산 "
+           "기준' 수치입니다. 소비재를 수입해 쓰는 나라는 실제 소비로 인한 "
+           "배출보다 낮게, 원유·가스를 수출용으로 많이 생산하는 나라는 국민의 "
+           "생활 수준보다 훨씬 높게 나옵니다. 산림 벌채 같은 토지이용 변화로 "
+           "인한 배출은 포함되지 않습니다.")
+
 
 # ════════════════════════════════════════════════════════════════
 def main() -> None:

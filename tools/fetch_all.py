@@ -113,6 +113,11 @@ SOURCES: list[tuple[str, str, str]] = [
      "1인당 해산물 소비량 (Our World in Data · FAO)",
      "https://ourworldindata.org/grapher/fish-and-seafood-consumption-per-capita.csv"
      "?csvType=full&useColumnShortNames=true"),
+
+    ("co2_per_capita.csv",
+     "1인당 CO2 배출량 1750~현재 (Our World in Data · Global Carbon Project)",
+     "https://ourworldindata.org/grapher/co-emissions-per-capita.csv"
+     "?csvType=full&useColumnShortNames=true"),
 ]
 
 
