@@ -64,8 +64,11 @@ def _ask(score, grade, directions):
         }],
         "generationConfig": {
             "temperature": 1.0,
-            "maxOutputTokens": 200,
+            "maxOutputTokens": 500,
             "responseMimeType": "application/json",
+            # gemini-2.5/3.x flash 는 기본적으로 '생각'에 먼저 토큰을 쓴다.
+            # 짧은 촌평 하나에는 필요 없으니 꺼서 답변 토큰을 확보한다.
+            "thinkingConfig": {"thinkingBudget": 0},
         },
     }
     req = urllib.request.Request(
@@ -75,7 +78,13 @@ def _ask(score, grade, directions):
         method="POST")
     with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
         out = json.loads(r.read().decode("utf-8"))
-    text = out["candidates"][0]["content"]["parts"][0]["text"]
+    cands = out.get("candidates") or []
+    if not cands or not cands[0].get("content", {}).get("parts"):
+        print(f"comment 빈 응답: finishReason="
+              f"{cands[0].get('finishReason') if cands else None} "
+              f"promptFeedback={out.get('promptFeedback')}")
+        return None
+    text = cands[0]["content"]["parts"][0]["text"]
     got = json.loads(text)
     return {"comment": str(got.get("comment", ""))[:300],
             "nickname": str(got.get("nickname", ""))[:20]}
