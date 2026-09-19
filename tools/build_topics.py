@@ -672,27 +672,33 @@ bm_cur = [r for r in bm if r["date"] == bm_latest]
 kor_bm = next(r for r in bm_cur if r["iso_a3"] == "KOR")
 usa_bm = next(r for r in bm_cur if r["iso_a3"] == "USA")
 jpn_bm = next(r for r in bm_cur if r["iso_a3"] == "JPN")
-chn_bm = next(r for r in bm_cur if r["iso_a3"] == "CHN")
-
-kor_price_won = float(kor_bm["local_price"])
-kor_price_usd = float(kor_bm["dollar_price"])
-kor_under_pct = abs(float(kor_bm["USD_raw"])) * 100
-
-bm_ranked = sorted(bm_cur, key=lambda r: -float(r["dollar_price"]))
 che_bm = next(r for r in bm_cur if r["iso_a3"] == "CHE")
+phl_bm = next(r for r in bm_cur if r["iso_a3"] == "PHL")
+vnm_bm = next(r for r in bm_cur if r["iso_a3"] == "VNM")
 
-chn_raw_pct = float(chn_bm["USD_raw"]) * 100
-chn_adj_pct = float(chn_bm["USD_adjusted"]) * 100
+kor_price_usd = float(kor_bm["dollar_price"])
+usa_price_usd = float(usa_bm["dollar_price"])
+che_price_usd = float(che_bm["dollar_price"])
+phl_price_usd = float(phl_bm["dollar_price"])
+vnm_price_usd = float(vnm_bm["dollar_price"])
 
-kor_bm_hist = sorted([r for r in bm if r["iso_a3"] == "KOR"],
+che_vs_phl = che_price_usd / phl_price_usd
+che_vs_vnm = che_price_usd / vnm_price_usd
+
+bm_under_ranked = sorted(bm_cur, key=lambda r: float(r["USD_raw"]))
+most_under = bm_under_ranked[0]
+under_name_ko = {"Indonesia": "인도네시아", "Taiwan": "대만", "India": "인도",
+                  "Philippines": "필리핀", "Egypt": "이집트"}
+
+pricier_than_usa = [r for r in bm_cur
+                     if float(r["dollar_price"]) > usa_price_usd]
+
+kor_jpy_over_pct = float(kor_bm["JPY_raw"]) * 100   # 원화의 엔화 대비 고/저평가
+
+usa_bm_hist = sorted([r for r in bm if r["iso_a3"] == "USA"],
                       key=lambda r: r["date"])
-kor_won_2000 = float(kor_bm_hist[0]["local_price"])
-kor_won_growth = kor_price_won / kor_won_2000
-
-trio_bm = {"스위스": float(che_bm["dollar_price"]),
-           "미국": float(usa_bm["dollar_price"]),
-           "한국": kor_price_usd, "일본": float(jpn_bm["dollar_price"])}
-top_bm_c = max(trio_bm, key=trio_bm.get)
+usa_price_2000 = float(usa_bm_hist[0]["local_price"])
+usa_price_growth = usa_price_usd / usa_price_2000
 
 topic(
     "bigmac", "🍔", "세계 체감 물가 퀴즈",
@@ -700,39 +706,41 @@ topic(
     "The Economist Big Mac Index",
     "https://github.com/TheEconomist/big-mac-data",
     [
-        slider("b1", f"{bm_latest[:7]} 기준, 한국의 빅맥 가격은 원화로 얼마일까요?",
-               kor_price_won, "원", 3000, 8000, 100,
-               f"{bm_latest[:7]} 한국 {kor_price_won:,.0f}원 "
-               f"(달러로 환산하면 ${kor_price_usd:.2f})",
-               "물가가 올랐다는 건 알아도 정확한 가격을 기억하는 사람은 "
-               "드뭅니다."),
-        slider("b2", "빅맥 지수로 보면, 원화는 달러 대비 몇 % 저평가돼 있을까요?",
-               kor_under_pct, "%", 0, 70, 1,
-               f"미국 빅맥 ${float(usa_bm['dollar_price']):.2f} · 한국 빅맥 "
-               f"${kor_price_usd:.2f} 기준 {kor_under_pct:.1f}% 저평가",
-               "환율이 실제 물가 수준과 얼마나 벌어져 있는지는 체감하기 "
-               "어렵습니다."),
-        choice("b3", "중국 위안화는 '단순 비교(raw)' 기준으로 37% 저평가인데, "
-                     "'소득 수준을 고려한(adjusted)' 기준으로는 저평가 정도가 "
-                     "더 커질까요, 작아질까요?",
-               ["더 커진다", "더 작아진다"], "더 작아진다",
-               f"raw {chn_raw_pct:.1f}% → GDP 조정 후 {chn_adj_pct:.1f}%",
-               "환율만 비교하면 크게 저평가된 것처럼 보이지만, 소득 수준을 "
-               "고려하면 격차가 줄어듭니다. 가난한 나라는 원래 물가 자체가 "
-               "쌉니다."),
-        choice("b4", "스위스·미국·한국·일본 중 빅맥 가격(달러 환산)이 가장 "
-                     "비싼 나라는?",
-               ["스위스", "미국", "한국", "일본"], top_bm_c,
-               " · ".join(f"{k} ${v:.2f}" for k, v in trio_bm.items()),
-               "미국이 제일 비쌀 것 같지만, 물가 높은 유럽 나라들이 그 위에 "
-               "있습니다."),
-        slider("b5", "2000년과 비교해 한국의 빅맥 가격(원화 기준)은 몇 배 "
-                     "올랐을까요?",
-               kor_won_growth, "배", 0, 5, 0.1,
-               f"2000년 {kor_won_2000:,.0f}원 → {bm_latest[:7]} "
-               f"{kor_price_won:,.0f}원 ({kor_won_growth:.1f}배)",
-               "물가가 오른 건 알아도 정확히 두 배가 채 안 된다는 감각은 "
-               "없기 마련입니다."),
+        slider("b1", "스위스에서 빅맥 1개 살 돈이면, 필리핀에서는 몇 개를 살 "
+                     "수 있을까요?",
+               che_vs_phl, "개", 0, 6, 0.1,
+               f"스위스 ${che_price_usd:.2f} ÷ 필리핀 ${phl_price_usd:.2f} = "
+               f"{che_vs_phl:.1f}개 (베트남 기준으로는 {che_vs_vnm:.1f}개)",
+               "같은 빅맥인데 나라마다 실제 구매력 차이는 가격표 숫자보다 "
+               "훨씬 큽니다."),
+        choice("b2", "현재 환율 대비 빅맥 기준으로 볼 때, 가장 심하게 "
+                     "저평가된 화폐는 어디일까요?",
+               ["인도네시아", "대만", "인도", "이집트"],
+               under_name_ko.get(most_under["name"], "인도네시아"),
+               f"1위 {under_name_ko.get(most_under['name'], most_under['name'])} "
+               f"({float(most_under['USD_raw']) * 100:.1f}%)",
+               "'저평가' 하면 떠오르는 나라와 실제로 가장 심한 나라는 다를 "
+               "수 있습니다."),
+        slider("b3", f"미국보다 빅맥 가격이 더 비싼 나라는 전 세계 "
+                     f"{len(bm_cur)}개국 중 몇 개국이나 될까요?",
+               len(pricier_than_usa), "개국", 0, 30, 1,
+               f"{len(pricier_than_usa)}개국 (스위스·노르웨이·유로존 등)",
+               "미국 물가가 세계에서 제일 비쌀 것 같지만, 실제로는 상당수 "
+               "나라가 미국보다 비쌉니다."),
+        choice("b4", "원화와 엔화 중, 빅맥 지수 기준으로 더 비싸게 평가된 "
+                     "화폐는 어느 쪽일까요?",
+               ["원화", "엔화"], "원화",
+               f"한국 빅맥 ${kor_price_usd:.2f} · 일본 빅맥 "
+               f"${float(jpn_bm['dollar_price']):.2f} — 원화가 엔화 대비 약 "
+               f"{kor_jpy_over_pct:.1f}% 고평가",
+               "엔저 때문에 일본 여행이 싸졌다는 인식이 강하지만, 빅맥 "
+               "기준으로는 원화가 오히려 비싼 쪽에 속합니다."),
+        slider("b5", "2000년과 비교해 미국의 빅맥 가격은 몇 배 올랐을까요?",
+               usa_price_growth, "배", 0, 6, 0.1,
+               f"2000년 ${usa_price_2000:.2f} → {bm_latest[:7]} "
+               f"${usa_price_usd:.2f} ({usa_price_growth:.1f}배)",
+               "물가가 오른 건 알아도 26년 새 거의 3배가 됐다는 크기는 "
+               "체감하기 어렵습니다."),
     ],
     caveat="빅맥 지수는 딱 하나의 상품 가격으로 물가를 추정하는 단순화된 "
            "지표입니다. 나라마다 임대료·인건비·현지 조달 비용이 다르고, "
