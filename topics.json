@@ -135,6 +135,13 @@
       "title": "얼마나 오래 사나",
       "blurb": "나라별 기대수명 1950~현재",
       "source": "Our World in Data"
+    },
+    {
+      "id": "pokemon",
+      "emoji": "👾",
+      "title": "포켓몬 스펙 감각",
+      "blurb": "겉모습만 보고 몸무게·스피드 비교하기 (PokeAPI)",
+      "source": "PokeAPI"
     }
   ]
 }

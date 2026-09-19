@@ -118,6 +118,13 @@ SOURCES: list[tuple[str, str, str]] = [
      "1인당 CO2 배출량 1750~현재 (Our World in Data · Global Carbon Project)",
      "https://ourworldindata.org/grapher/co-emissions-per-capita.csv"
      "?csvType=full&useColumnShortNames=true"),
+
+    *[(f"pokemon_{name}.json", f"포켓몬 스펙 · {name} (PokeAPI)",
+       f"https://pokeapi.co/api/v2/pokemon/{name}")
+      for name in (
+          "pikachu", "jigglypuff", "arcanine", "mamoswine", "snorlax",
+          "magnemite", "dragonite", "machamp", "ditto", "gyarados",
+      )],
 ]
 
 

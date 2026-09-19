@@ -795,6 +795,70 @@ topic(
            "생활 수준보다 훨씬 높게 나옵니다. 산림 벌채 같은 토지이용 변화로 "
            "인한 배출은 포함되지 않습니다.")
 
+# ── 13. 포켓몬 스펙 감각 (보너스) ────────────────────────────────
+# 실제로 측정한 값이 아니라 게임이 정해 둔 설정값이라는 점에 유의 (caveat 참고).
+_POKE_NAMES = ("pikachu", "jigglypuff", "arcanine", "mamoswine", "snorlax",
+               "magnemite", "dragonite", "machamp", "ditto", "gyarados")
+POKE = {name: load_json(f"pokemon_{name}.json") for name in _POKE_NAMES}
+
+
+def poke_weight(name):
+    return POKE[name]["weight"] / 10          # kg
+
+
+def poke_height(name):
+    return POKE[name]["height"] / 10          # m
+
+
+def poke_speed(name):
+    return next(s["base_stat"] for s in POKE[name]["stats"]
+                if s["stat"]["name"] == "speed")
+
+
+pika_w = poke_weight("pikachu")
+puri_w = poke_weight("jigglypuff")
+koil_w = poke_weight("magnemite")
+jamb_w, jamb_h = poke_weight("snorlax"), poke_height("snorlax")
+gyar_w, gyar_h = poke_weight("gyarados"), poke_height("gyarados")
+gwe_spd = poke_speed("machamp")
+mangna_spd = poke_speed("dragonite")
+
+topic(
+    "pokemon", "👾", "포켓몬 스펙 감각",
+    "겉모습만 보고 몸무게·스피드 비교하기 (PokeAPI)",
+    "PokeAPI", "https://pokeapi.co/",
+    [
+        slider("m1", "국민 마스코트 피카츄의 실제 몸무게는 몇 kg일까요?",
+               pika_w, "kg", 0, 20, 0.5,
+               f"피카츄 {pika_w:.1f}kg (키 {poke_height('pikachu'):.1f}m)",
+               "작고 가벼워 보이지만, 막상 숫자로 보면 꽤 묵직합니다."),
+        choice("m2", "푸린과 피카츄 중, 실제 몸무게가 더 무거운 쪽은?",
+               ["푸린", "피카츄"], "피카츄",
+               f"피카츄 {pika_w:.1f}kg · 푸린 {puri_w:.1f}kg",
+               "동글동글한 푸린이 더 커 보이지만, 몸무게는 피카츄가 근소하게 "
+               "앞섭니다."),
+        choice("m3", "작은 쇳덩이 코일과 피카츄, 몸무게가 더 무거운 쪽은?",
+               ["코일", "피카츄", "둘 다 같다"], "둘 다 같다",
+               f"코일 {koil_w:.1f}kg · 피카츄 {pika_w:.1f}kg — 정확히 같습니다",
+               "생김새는 완전히 다르지만, 설정값상 몸무게는 똑같습니다."),
+        choice("m4", "잠만보와 갸라도스 중, 실제 몸무게가 더 무거운 쪽은?",
+               ["잠만보", "갸라도스"], "잠만보",
+               f"잠만보 {jamb_w:.1f}kg(키 {jamb_h:.1f}m) · "
+               f"갸라도스 {gyar_w:.1f}kg(키 {gyar_h:.1f}m)",
+               "몸길이는 갸라도스가 3배 가까이 길지만, 몸무게는 잠만보가 두 배 "
+               "가까이 더 나갑니다."),
+        choice("m5", "근육질 괴력몬과 덩치 큰 망나뇽 중, 기본 스피드가 더 빠른 "
+                     "쪽은?",
+               ["괴력몬", "망나뇽"], "망나뇽",
+               f"망나뇽 스피드 {mangna_spd} · 괴력몬 스피드 {gwe_spd}",
+               "근육이 많으면 빠를 것 같지만, 도감 수치로는 몸집이 큰 망나뇽이 "
+               "더 빠릅니다."),
+    ],
+    caveat="여기 나온 몸무게·스피드는 실제로 측정한 값이 아니라 게임 개발사가 "
+           "밸런스를 위해 정해 둔 설정값입니다. 스피드는 실제 이동 속도가 아니라 "
+           "전투에서 누가 먼저 행동할지를 정하는 수치이고, 몸무게도 게임 "
+           "세대가 바뀌며 조정되기도 합니다.")
+
 # ── 화면에 보여줄 카드 순서 ──────────────────────────────────────
 # 계산 순서(위 코드 순서)와 화면에 보이는 카드 순서는 다를 수 있다.
 # cities(내 주제) → 보너스 2개 → 나머지는 원래 만든 순서.
