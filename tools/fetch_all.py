@@ -103,6 +103,16 @@ SOURCES: list[tuple[str, str, str]] = [
      "?format=geojson&starttime=2000-01-01&endtime=2024-12-31"
      "&minmagnitude=3.0&minlatitude=33&maxlatitude=39.5"
      "&minlongitude=124&maxlongitude=132&limit=20000"),
+
+    ("meat_consumption.csv",
+     "1인당 육류 소비량 (Our World in Data · FAO)",
+     "https://ourworldindata.org/grapher/daily-meat-consumption-per-person.csv"
+     "?csvType=full&useColumnShortNames=true"),
+
+    ("fish_consumption.csv",
+     "1인당 해산물 소비량 (Our World in Data · FAO)",
+     "https://ourworldindata.org/grapher/fish-and-seafood-consumption-per-capita.csv"
+     "?csvType=full&useColumnShortNames=true"),
 ]
 
 

@@ -121,6 +121,13 @@
       "title": "얼마나 오래 사나",
       "blurb": "나라별 기대수명 1950~현재",
       "source": "Our World in Data"
+    },
+    {
+      "id": "food-consumption",
+      "emoji": "🍖",
+      "title": "세계 음식 소비량",
+      "blurb": "나라별 1인당 육류·해산물 소비량 (1961~현재)",
+      "source": "Our World in Data (FAO)"
     }
   ]
 }

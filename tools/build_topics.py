@@ -639,6 +639,80 @@ topic(
                "내가 사는 곳의 수준을 세계 평균으로 착각하기 쉽습니다."),
     ])
 
+# ── 11. 세계 음식 소비량 (보너스) ────────────────────────────────
+# FAO 식량수급표(Food Balance Sheet) 기반 OWID 자료. '실제로 먹은 양'이 아니라
+# 생산+수입-수출-사료-폐기물 등을 인구로 나눈 '공급 기준' 값이라는 점에
+# 유의한다 (아래 caveat 참고).
+MEAT_COL = ("meat__total__00002943__food_available_for_consumption"
+            "__0645pe__grams_per_day_per_capita")
+FISH_COL = ("fish_and_seafood__00002960__food_available_for_consumption"
+            "__0645pc__kilograms_per_year_per_capita")
+meat_rows = [r for r in load_csv("meat_consumption.csv") if r[MEAT_COL]]
+fish_rows = [r for r in load_csv("fish_consumption.csv") if r[FISH_COL]]
+
+food_year = max(int(r["year"]) for r in meat_rows if r["code"] == "KOR")
+meat_cur = owid_countries(meat_rows, food_year, MEAT_COL)
+fish_cur = owid_countries(fish_rows, food_year, FISH_COL)
+
+kor_meat = meat_cur["South Korea"]                     # g/일
+kor_meat_kg = kor_meat * 365 / 1000                    # 연간 kg 환산
+kor_fish = fish_cur["South Korea"]                     # kg/년 (원 단위)
+
+kor_meat_1961 = next(float(r[MEAT_COL]) for r in meat_rows
+                     if r["code"] == "KOR" and r["year"] == "1961")
+meat_growth = kor_meat / kor_meat_1961
+
+fish_rank = sorted(fish_cur.items(), key=lambda kv: -kv[1])
+kor_fish_rank = [k for k, _ in fish_rank].index("South Korea") + 1
+
+trio_meat = {c: meat_cur[c] for c in
+             ("United States", "Argentina", "Australia", "South Korea")}
+top_meat_c = max(trio_meat, key=trio_meat.get)
+name_meat = {"United States": "미국", "Argentina": "아르헨티나",
+             "Australia": "호주", "South Korea": "한국"}
+
+topic(
+    "food-consumption", "🍖", "세계 음식 소비량",
+    "나라별 1인당 육류·해산물 소비량 (1961~현재)",
+    "Our World in Data (FAO)",
+    "https://ourworldindata.org/grapher/daily-meat-consumption-per-person",
+    [
+        slider("f1", f"{food_year}년 한국인 1인당 하루 육류 소비량은 몇 g쯤일까요?",
+               kor_meat, "g", 0, 400, 10,
+               f"{food_year}년 한국 {kor_meat:.1f}g/일 "
+               f"(연간 {kor_meat_kg:.1f}kg에 해당)",
+               "매일 먹는다는 느낌은 있어도 하루 그램 수로 세어 본 적은 드뭅니다."),
+        choice("f2", "다음 네 나라 중 1인당 하루 육류 소비량이 가장 많은 나라는?",
+               ["미국", "아르헨티나", "호주", "한국"], name_meat[top_meat_c],
+               " · ".join(f"{name_meat[c]} {trio_meat[c]:.1f}g" for c in trio_meat),
+               "'고기 하면 아르헨티나'라는 인상이 강하지만, 하루 섭취량 자체는 "
+               "미국이 근소하게 앞섭니다."),
+        choice("f3", "한국인이 무게로 더 많이 먹는 것은 육류일까, 해산물일까?",
+               ["육류", "해산물"], "육류",
+               f"{food_year}년 육류 {kor_meat_kg:.1f}kg/년 · "
+               f"해산물 {kor_fish:.1f}kg/년",
+               "'물 좋은 나라, 생선 많이 먹는 나라'라는 인상과 달리, 무게로 "
+               "따지면 이미 육류가 해산물을 앞질렀습니다."),
+        slider("f4", f"해산물 소비량 기준, 한국은 전 세계 {len(fish_cur)}개국 중 "
+                     "몇 위일까요?",
+               kor_fish_rank, "위", 1, 50, 1,
+               f"{food_year}년 {len(fish_cur)}개국 중 {kor_fish_rank}위 "
+               f"(1위 아이슬란드 {fish_rank[0][1]:.1f}kg/년 · "
+               f"한국 {kor_fish:.1f}kg/년)",
+               "정확한 순위를 맞히긴 어려워도, 상위권이라는 인상 자체는 사실과 "
+               "맞아떨어집니다."),
+        slider("f5", "1961년과 비교해 한국인의 하루 육류 소비량은 몇 배 늘었을까요?",
+               meat_growth, "배", 0, 30, 1,
+               f"1961년 {kor_meat_1961:.1f}g/일 → {food_year}년 "
+               f"{kor_meat:.1f}g/일 ({meat_growth:.1f}배)",
+               "한국이 훨씬 잘살게 됐다는 감각은 있어도, 식탁 위 변화가 20배 "
+               "규모라는 건 체감하기 어렵습니다."),
+    ],
+    caveat="이 값은 실제 섭취량이 아니라 FAO 식량수급표가 생산·수입·수출·사료·"
+           "폐기물 등을 계산해 인구로 나눈 '공급 기준' 수치입니다. 유통·가정에서 "
+           "버려지는 양까지 포함되어 있어 실제로 몸에 들어가는 양보다 많게 "
+           "잡히고, 국가 평균이라 소득·지역별 차이는 드러나지 않습니다.")
+
 
 # ════════════════════════════════════════════════════════════════
 def main() -> None:
