@@ -473,44 +473,62 @@ CN = {"seoul": "서울", "tokyo": "도쿄", "london": "런던", "singapore": "�
 YRS = 30
 c_rain = {k: sum(x["r"] for x in v) / YRS for k, v in CITY.items()}
 c_days = {k: sum(1 for x in v if x["r"] >= 1) / YRS for k, v in CITY.items()}
-c_temp = {k: mean((x["hi"] + x["lo"]) / 2 for x in v) for k, v in CITY.items()}
-c_hot = {k: max(x["hi"] for x in v) for k, v in CITY.items()}
-c_jan = {k: mean(x["lo"] for x in v if x["d"].month == 1) for k, v in CITY.items()}
-dry = min(c_rain, key=c_rain.get)
-hottest = max(c_hot, key=c_hot.get)
-colder = "서울" if c_jan["seoul"] < c_jan["tokyo"] else "도쿄"
+
+
+def monthly_avg(v):
+    """월별 평균기온((최고+최저)/2) — 1~12월 딕셔너리."""
+    buckets = {m: [] for m in range(1, 13)}
+    for x in v:
+        buckets[x["d"].month].append((x["hi"] + x["lo"]) / 2)
+    return {m: mean(vals) for m, vals in buckets.items()}
+
+
+c_month = {k: monthly_avg(v) for k, v in CITY.items()}
+c_range = {k: max(m.values()) - min(m.values()) for k, m in c_month.items()}
+c_summer = {k: mean(x["hi"] for x in v if x["d"].month in (6, 7, 8))
+            for k, v in CITY.items()}
+
+rainier_days = "런던" if c_days["london"] > c_days["seoul"] else "서울"
+more_rain = "서울" if c_rain["seoul"] > c_rain["london"] else "런던"
+london_pct = c_rain["london"] / c_rain["seoul"] * 100
+range_ratio = c_range["seoul"] / c_range["singapore"]
+summer_warmer = "서울" if c_summer["seoul"] > c_summer["tokyo"] else "도쿄"
 
 topic(
     "cities", "🏙️", "서울·도쿄·런던·싱가포르",
     "네 도시의 30년 평년값 (1991~2020)",
     "Open-Meteo Archive (ERA5 재분석)", "https://open-meteo.com/",
     [
-        choice("c1", "1년 강수량이 가장 적은 도시는?",
-               ["서울", "도쿄", "런던", "싱가포르"], CN[dry],
-               " · ".join(f"{CN[k]} {c_rain[k]:,.0f}mm" for k in CITY),
-               "비가 자주 오는 것과 많이 오는 것은 다릅니다. 런던은 자주 오지만 "
-               "적게 옵니다."),
-        slider("c2", "런던에서 1년에 비가 오는 날(1mm 이상)은 며칠일까요?",
-               c_days["london"], "일", 40, 220, 5,
-               f"런던 {c_days['london']:.0f}일 · 서울 {c_days['seoul']:.0f}일 "
-               f"(강수량은 런던 {c_rain['london']:,.0f}mm · "
-               f"서울 {c_rain['seoul']:,.0f}mm)",
-               "런던은 서울보다 비 오는 날이 많은데 총량은 절반입니다. "
-               "'며칠 왔나'와 '얼마나 왔나'는 다른 질문입니다."),
-        choice("c3", "30년간 가장 높은 기온을 기록한 도시는?",
-               ["서울", "도쿄", "런던", "싱가포르"], CN[hottest],
-               " · ".join(f"{CN[k]} {c_hot[k]:.1f}도" for k in CITY),
-               "적도에 가까울수록 덥다고 생각하지만, 최고기온 기록은 중위도 "
-               "도시에서 나옵니다."),
-        slider("c4", "서울의 연평균 기온은?",
-               c_temp["seoul"], "도", 5, 30, 0.5,
-               " · ".join(f"{CN[k]} {c_temp[k]:.1f}도" for k in CITY),
-               "여름과 겨울의 기억이 강해서 연평균은 감이 잘 안 옵니다."),
-        choice("c5", "1월 밤이 더 추운 도시는?",
-               ["서울", "도쿄"], colder,
-               f"1월 평균 최저기온 서울 {c_jan['seoul']:.1f}도 · "
-               f"도쿄 {c_jan['tokyo']:.1f}도",
-               "위도가 비슷해도 대륙의 영향을 받는 도시가 훨씬 춥습니다."),
+        choice("c1", "서울과 런던 중, 1년에 비 오는 날(1mm 이상)이 더 많은 "
+               "도시는?",
+               ["서울", "런던"], rainier_days,
+               f"런던 {c_days['london']:.0f}일 · 서울 {c_days['seoul']:.0f}일",
+               "런던은 '비의 도시'라는 인상 때문에 자주 온다고 생각하기 쉽고, "
+               "실제로도 서울보다 비 오는 날 자체는 더 많습니다."),
+        choice("c2", "그런데 1년 강수량(mm) 총량이 더 많은 도시는?",
+               ["서울", "런던"], more_rain,
+               f"서울 {c_rain['seoul']:,.0f}mm · 런던 {c_rain['london']:,.0f}mm",
+               "비 오는 '날'이 많다고 '양'도 많은 건 아닙니다. 런던은 조금씩 "
+               "자주 오고, 서울은 장마·태풍 때 몰아서 옵니다."),
+        slider("c3", "런던의 연강수량은 서울의 몇 %일까요?",
+               london_pct, "%", 0, 150, 5,
+               f"런던 {c_rain['london']:,.0f}mm ÷ 서울 {c_rain['seoul']:,.0f}mm "
+               f"× 100",
+               "'비가 많이 오는 도시'라는 인상과 달리 런던의 연강수량은 서울의 "
+               "절반 수준입니다."),
+        slider("c4", "서울의 연교차(가장 더운 달 − 가장 추운 달의 평균기온 "
+               "차이)는 싱가포르의 몇 배일까요?",
+               range_ratio, "배", 0, 30, 1,
+               f"서울 연교차 {c_range['seoul']:.1f}도 · 싱가포르 연교차 "
+               f"{c_range['singapore']:.1f}도",
+               "싱가포르는 적도 부근이라 계절 변화가 거의 없고, 서울은 사계절이 "
+               "뚜렷해 그 차이가 20배가 넘습니다."),
+        choice("c5", "여름철(6~8월) 평균 최고기온이 더 높은 도시는 서울일까 "
+               "도쿄일까?",
+               ["서울", "도쿄"], summer_warmer,
+               f"서울 {c_summer['seoul']:.1f}도 · 도쿄 {c_summer['tokyo']:.1f}도",
+               "도쿄가 더 습해서 체감은 더 덥지만, 평균 최고기온 자체는 두 "
+               "도시가 거의 같습니다."),
     ],
     caveat="ERA5 재분석 값이고, 도시별로 관측소 위치와 기준이 다릅니다.")
 
