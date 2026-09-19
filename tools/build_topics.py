@@ -795,6 +795,21 @@ topic(
            "생활 수준보다 훨씬 높게 나옵니다. 산림 벌채 같은 토지이용 변화로 "
            "인한 배출은 포함되지 않습니다.")
 
+# ── 화면에 보여줄 카드 순서 ──────────────────────────────────────
+# 계산 순서(위 코드 순서)와 화면에 보이는 카드 순서는 다를 수 있다.
+# cities(내 주제) → 보너스 2개 → 나머지는 원래 만든 순서.
+_CARD_ORDER = ["cities", "food-consumption", "carbon"]
+_original_order = list(TOPICS)
+
+
+def _card_rank(t):
+    if t["id"] in _CARD_ORDER:
+        return _CARD_ORDER.index(t["id"])
+    return len(_CARD_ORDER) + _original_order.index(t)
+
+
+TOPICS.sort(key=_card_rank)
+
 
 # ════════════════════════════════════════════════════════════════
 def main() -> None:

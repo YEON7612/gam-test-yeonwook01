@@ -53,6 +53,27 @@
   ],
   "topics": [
     {
+      "id": "cities",
+      "emoji": "🏙️",
+      "title": "서울·도쿄·런던·싱가포르",
+      "blurb": "네 도시의 30년 평년값 (1991~2020)",
+      "source": "Open-Meteo Archive (ERA5 재분석)"
+    },
+    {
+      "id": "food-consumption",
+      "emoji": "🍖",
+      "title": "세계 음식 소비량",
+      "blurb": "나라별 1인당 육류·해산물 소비량 (1961~현재)",
+      "source": "Our World in Data (FAO)"
+    },
+    {
+      "id": "carbon",
+      "emoji": "🏭",
+      "title": "1인당 탄소 배출량",
+      "blurb": "나라별 1인당 CO2 배출량 (1750~현재)",
+      "source": "Our World in Data (Global Carbon Project)"
+    },
+    {
       "id": "seoul-heat",
       "emoji": "🌡️",
       "title": "서울은 얼마나 더워졌나",
@@ -102,13 +123,6 @@
       "source": "Frankfurter (유럽중앙은행 고시)"
     },
     {
-      "id": "cities",
-      "emoji": "🏙️",
-      "title": "서울·도쿄·런던·싱가포르",
-      "blurb": "네 도시의 30년 평년값 (1991~2020)",
-      "source": "Open-Meteo Archive (ERA5 재분석)"
-    },
-    {
       "id": "quakes",
       "emoji": "🌎",
       "title": "지진은 얼마나 자주",
@@ -121,20 +135,6 @@
       "title": "얼마나 오래 사나",
       "blurb": "나라별 기대수명 1950~현재",
       "source": "Our World in Data"
-    },
-    {
-      "id": "food-consumption",
-      "emoji": "🍖",
-      "title": "세계 음식 소비량",
-      "blurb": "나라별 1인당 육류·해산물 소비량 (1961~현재)",
-      "source": "Our World in Data (FAO)"
-    },
-    {
-      "id": "carbon",
-      "emoji": "🏭",
-      "title": "1인당 탄소 배출량",
-      "blurb": "나라별 1인당 CO2 배출량 (1750~현재)",
-      "source": "Our World in Data (Global Carbon Project)"
     }
   ]
 }
